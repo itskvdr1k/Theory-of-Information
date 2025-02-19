@@ -181,11 +181,11 @@
         })
 
         const cleanTextFence = (text) => {
-            return text.replace(/[^a-zA-Z]/g, '').toLowerCase();
+            return text.replace(/[^a-zA-Z]/g, '');
         }
 
         const cleanText = (text) => {
-            return text.toLowerCase().replace(new RegExp(`[^${alphabet}]`, 'g'), '').toLowerCase();
+            return text.toLowerCase().replace(new RegExp(`[^${alphabet}]`, 'g'), '');
         }
 
         const readDataFromFile = (event, inputField) => {
@@ -285,12 +285,22 @@
             const message = cleanTextFence(messageFenceInput.value)
             const key = parseInt(keyFenceInput.value, 10)
 
+            if (key > message.length) {
+                alert(`Длина ключа не может быть больше длины вашего сообщения. Введите другое значения ключа, не превосходящее ${messageFenceInput.value.length}`);
+                return 
+            }
+
             const encryptedText = encryptRailFence(message, key)
             resultFieldFence.textContent = encryptedText;
         })
         decipherButtonFence.addEventListener("click", () => {
             const message = cleanTextFence(messageFenceInput.value)
             const key = parseInt(keyFenceInput.value, 10)
+
+            if (key > message.length) {
+                alert(`Длина ключа не может быть больше длины вашего сообщения. Введите другое значения ключа, не превосходящее ${messageFenceInput.value.length}`);
+                return 
+            }
 
             const decipheredText = decipherRailFence(message, key)
             resultFieldFence.textContent = decipheredText;
