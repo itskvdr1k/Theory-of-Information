@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Теория Информации (ТИ), Лабораторная работа №1</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .form__group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div>
+            <h2>1. Железнодорожная изгородь</h2>
+            <form class="form" action="#" method="post" id="formRailFence">
+                <div class="form__group">
+                    <label for="message">Исходный текст</label>
+                    <input name="message" id="message-fence" placeholder="Исходный текст: " type="text"/>
+                </div>
+                <div class="form__group">
+                    <label for="key">Ключ</label>
+                    <input type="number" id="key-fence" placeholder="Ключ: " min="2">
+                </div>
+                <div class="form__buttons">
+                    <button class="form__button" id="cipher-button-fence">Зашифровать</button>
+                    <button class="form__button" id="decipher-button-fence">Дешифровать</button>
+                </div>
+            </form>
+            <div>
+                <h3>Результат:</h3>
+                <p id="result-fence">
+
+                </p>
+            </div>
+        </div>
+        <div>
+            <h2>2. Шифр Виженера</h2>
+            <form class="form" action="#" method="post" id="formVigenere">
+                <div class="form__group">
+                    <label for="message">Исходный текст</label>
+                    <input name="message" id="message-vigenere" placeholder="Исходный текст: " type="text"/>
+                </div>
+                <div class="form__group">
+                    <label for="key">Ключ</label>
+                    <input type="text" id="key-vigenere" placeholder="Ключ: ">
+                </div>
+                <div class="form__buttons">
+                    <button class="form__button" id="cipher-button-vigenere">Зашифровать</button>
+                    <button class="form__button" id="decipher-button-vigenere">Дешифровать</button>
+                </div>
+            </form>
+            <div>
+                <h3>Результат:</h3>
+                <p id="result-vigenere">
+
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fence algorythm
+
+        const cipherButtonFence = document.getElementById("cipher-button-fence")
+        const decipherButtonFence = document.getElementById("decipher-button-fence")
+
+        const messageFenceInput = document.getElementById("message-fence")
+        const keyFenceInput = document.getElementById("key-fence")
+
+        const resultFieldFence = document.getElementById("result-fence")
+
+        // Vigenere algorythm
+
+        const alphabet = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+        const alphabetLength = alphabet.length;
+
+        const cipherButtonVigenere = document.getElementById("cipher-button-vigenere")
+        const decipherButtonVigenere = document.getElementById("decipher-button-vigenere")
+
+        const messageFenceVigenere = document.getElementById("message-vigenere")
+        const keyFenceVigenere = document.getElementById("key-vigenere")
+
+        const resultFieldVigenere = document.getElementById("result-vigenere")
+
+        // Forms
+
+        const forms = document.querySelectorAll("form")
+
+        forms.forEach(form => {
+            form.addEventListener("submit", event => {
+                event.preventDefault()
+            })
+        })
+
+        const cleanTextFence = (text) => {
+            return text.replace(/[^a-zA-Z]/g, '').toLowerCase();
+        }
+
+        const cleanText = (text) => {
+            return text.toLowerCase().replace(new RegExp(`[^${alphabet}]`, 'g'), '').toLowerCase();
+        }
+
+         // Rail Fence
+
+        const encryptRailFence = (message, key) => {
+            const keyArray = Array.from({ length: key }, () => []);
+            let directionDown = false;
+            let row = 0;
+
+            for (let char of message) {
+                keyArray[row].push(char);
+                if (row === 0 || row === key - 1) {
+                    directionDown = !directionDown;
+                }
+                row += directionDown ? 1 : -1;
+            }
+
+            return keyArray.flat().join('');
+        }
+        const decipherRailFence = (text, key) => {
+            const railArray = Array.from({ length: key }, () => []);
+            const marker = Array(text.length).fill(false);
+            let directionDown = false;
+            let row = 0;
+
+            for (let i = 0; i < text.length; i++) {
+                marker[i] = row;
+                if (row === 0 || row === key - 1) {
+                    directionDown = !directionDown;
+                }
+                row += directionDown ? 1 : -1;
+            }
+            let index = 0;
+            for (let r = 0; r < key; r++) {
+                for (let i = 0; i < text.length; i++) {
+                    if (marker[i] === r) {
+                        railArray[r].push(text[index++]);
+                    }
+                }
+            }
+            let output = '';
+            row = 0;
+            directionDown = false;
+            for (let i = 0; i < text.length; i++) {
+                output += railArray[row].shift();
+                if (row === 0 || row === key - 1) {
+                    directionDown = !directionDown;
+                }
+                row += directionDown ? 1 : -1;
+            }
+            return output;
+        }
+        cipherButtonFence.addEventListener("click", () => {
+            const message = cleanTextFence(messageFenceInput.value)
+            const key = parseInt(keyFenceInput.value, 10)
+
+            const encryptedText = encryptRailFence(message, key)
+            resultField.textContent = encryptedText;
+        })
+        decipherButtonFence.addEventListener("click", () => {
+            const message = cleanTextFence(messageFenceInput.value)
+            const key = parseInt(keyFenceInput.value, 10)
+
+            const decipheredText = decipherRailFence(message, key)
+            resultField.textContent = decipheredText;
+        })
+
+        // Vigenere
+
+        const encryptVinegere = (message, key) => {
+            let encryptedText = '';
+            let keyIndex = 0;
+
+            for (let char of message) {
+                const textCharIndex = alphabet.indexOf(char);
+                const keyCharIndex = alphabet.indexOf(key[keyIndex % key.length]);
+                const encryptedCharIndex = (textCharIndex + keyCharIndex) % alphabetLength;
+                encryptedText += alphabet[encryptedCharIndex];
+                keyIndex++;
+            }
+
+            return encryptedText;
+        }
+        const decryptVinegere = (text, key) => {
+            let decryptedText = '';
+            let keyIndex = 0;
+
+            for (let char of text) {
+                const textCharIndex = alphabet.indexOf(char);
+                const keyCharIndex = alphabet.indexOf(key[keyIndex % key.length]);
+                const decryptedCharIndex = (textCharIndex - keyCharIndex + alphabetLength) % alphabetLength;
+                decryptedText += alphabet[decryptedCharIndex];
+                keyIndex++;
+            }
+
+            return decryptedText;
+        }
+
+        cipherButtonVigenere.addEventListener("click", () => {
+            const message = cleanText(messageFenceVigenere.value)
+            const key = cleanText(keyFenceVigenere.value)
+
+            const encryptedText = encryptVinegere(message, key)
+            resultFieldVigenere.textContent = encryptedText
+        })
+        decipherButtonVigenere.addEventListener("click", () => {
+            const message = cleanText(messageFenceVigenere.value)
+            const key = cleanText(keyFenceVigenere.value)
+
+            const decryptedText = decryptVinegere(message, key)
+            resultFieldVigenere.textContent = decryptedText
+        })
+
+    </script>
+</body>
+</html>
