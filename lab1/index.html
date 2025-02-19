@@ -6,6 +6,7 @@
     <title>Теория Информации (ТИ), Лабораторная работа №1</title>
     <style>
         body {
+            font-size: 20px;
             margin: 0;
             padding: 0;
             width: 100%;
@@ -27,61 +28,117 @@
         .wrapper {
             display: flex;
             flex-direction: column;
+        }
+        .block {
+            padding: 20px;
+            border: 1px solid black;
+            display: none;
+            min-width: 660px;
+        }
+        .block.active {
+            display: block;
+        }
+        nav {
+            padding: 10px 20px;
+            border: 1px solid black;
+        }
+        .tabs {
+            display: flex;
+            flex-direction: column;
             gap: 10px;
+        }
+        input {
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
     <div class="wrapper">
-        <div>
-            <h2>1. Железнодорожная изгородь</h2>
-            <form class="form" action="#" method="post" id="formRailFence">
-                <div class="form__group">
-                    <label for="message">Исходный текст</label>
-                    <input name="message" id="message-fence" placeholder="Исходный текст: " type="text"/>
-                </div>
-                <div class="form__group">
-                    <label for="key">Ключ</label>
-                    <input type="number" id="key-fence" placeholder="Ключ: " min="2">
-                </div>
-                <div class="form__buttons">
-                    <button class="form__button" id="cipher-button-fence">Зашифровать</button>
-                    <button class="form__button" id="decipher-button-fence">Дешифровать</button>
-                </div>
-            </form>
-            <div>
-                <h3>Результат:</h3>
-                <p id="result-fence">
+        <nav>
+            <button id="first-tab-link">Изгородь</button>
+            <button id="second-tab-link">Шифр Виженера</button>
+        </nav>
+        <div class="tabs">
+            <div id="first-tab" class="block active"> 
+                <h2>1. Железнодорожная изгородь</h2>
+                <form class="form" action="#" method="post" id="formRailFence">
+                    <div class="form__group">
+                        <label for="message">Исходный текст</label>
+                        <input required name="message" id="message-fence" placeholder="Исходный текст: " type="text"/>
+                    </div>
+                    <div>
+                        <label for="message">или</label>
+                        <input name="file-input-fence" id="file-input-fence" type="file"/>
+                    </div>
+                    <div class="form__group">
+                        <label for="key">Ключ</label>
+                        <input required type="number" id="key-fence" placeholder="Ключ: " min="2">
+                    </div>
+                    <div class="form__buttons">
+                        <button class="form__button" id="cipher-button-fence">Зашифровать</button>
+                        <button class="form__button" id="decipher-button-fence">Дешифровать</button>
+                    </div>
+                </form>
+                <div>
+                    <h3>Результат:</h3>
+                    <p id="result-fence">
 
-                </p>
+                    </p>
+                    <button id="button-fence-save">Сохранить в файл</button>
+                    <button id="button-fence-clear">Очистить поля</button>
+                </div>
             </div>
-        </div>
-        <div>
-            <h2>2. Шифр Виженера</h2>
-            <form class="form" action="#" method="post" id="formVigenere">
-                <div class="form__group">
-                    <label for="message">Исходный текст</label>
-                    <input name="message" id="message-vigenere" placeholder="Исходный текст: " type="text"/>
-                </div>
-                <div class="form__group">
-                    <label for="key">Ключ</label>
-                    <input type="text" id="key-vigenere" placeholder="Ключ: ">
-                </div>
-                <div class="form__buttons">
-                    <button class="form__button" id="cipher-button-vigenere">Зашифровать</button>
-                    <button class="form__button" id="decipher-button-vigenere">Дешифровать</button>
-                </div>
-            </form>
-            <div>
-                <h3>Результат:</h3>
-                <p id="result-vigenere">
+            <div id="second-tab" class="block">
+                <h2>2. Шифр Виженера</h2>
+                <form class="form" action="#" method="post" id="formVigenere">
+                    <div class="form__group">
+                        <label for="message">Исходный текст</label>
+                        <input required name="message" id="message-vigenere" placeholder="Исходный текст: " type="text"/>
+                    </div>
+                    <div>
+                        <label for="message">или</label>
+                        <input name="file-input-vigenere" id="file-input-vigenere" type="file"/>
+                    </div>
+                    <div class="form__group">
+                        <label for="key">Ключ</label>
+                        <input required type="text" id="key-vigenere" placeholder="Ключ: ">
+                    </div>
+                    <div class="form__buttons">
+                        <button class="form__button" id="cipher-button-vigenere">Зашифровать</button>
+                        <button class="form__button" id="decipher-button-vigenere">Дешифровать</button>
+                    </div>
+                </form>
+                <div>
+                    <h3>Результат:</h3>
+                    <p id="result-vigenere">
 
-                </p>
+                    </p>
+                    <button id="button-vigenere-save">Сохранить в файл</button>
+                    <button id="button-vigenere-clear">Очистить поля</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Tabs 
+
+        const firstTab = document.getElementById("first-tab")
+        const secondTab = document.getElementById("second-tab")
+
+        const firstTabLink = document.getElementById("first-tab-link")
+        const secondTabLink = document.getElementById("second-tab-link")
+
+        firstTabLink.addEventListener("click", (e) => {
+            firstTab.classList.add("active")
+            secondTab.classList.remove("active")
+        })
+
+        secondTabLink.addEventListener("click", () => {
+            firstTab.classList.remove("active")
+            secondTab.classList.add("active")
+        })
+
         // Fence algorythm
 
         const cipherButtonFence = document.getElementById("cipher-button-fence")
@@ -91,6 +148,10 @@
         const keyFenceInput = document.getElementById("key-fence")
 
         const resultFieldFence = document.getElementById("result-fence")
+
+        const fenceFileInput = document.getElementById("file-input-fence")
+        const buttonFence = document.getElementById("button-fence-save")
+        const buttonFenceClear = document.getElementById("button-fence-clear")
 
         // Vigenere algorythm
 
@@ -104,6 +165,10 @@
         const keyFenceVigenere = document.getElementById("key-vigenere")
 
         const resultFieldVigenere = document.getElementById("result-vigenere")
+
+        const vigenereFileInput = document.getElementById("file-input-vigenere")
+        const buttonVigenere = document.getElementById("button-vigenere-save")
+        const buttonVigenereClear = document.getElementById("button-vigenere-clear")
 
         // Forms
 
@@ -123,7 +188,50 @@
             return text.toLowerCase().replace(new RegExp(`[^${alphabet}]`, 'g'), '').toLowerCase();
         }
 
+        const readDataFromFile = (event, inputField) => {
+            let content = '';
+            const file = event.target.files[0]
+            if (file) {
+                const reader = new FileReader() 
+                reader.onload = (e) => {
+                    content = e.target.result
+                    inputField.value = content
+                }
+                reader.readAsText(file)
+            }
+            return content
+        }
+        const saveToFile = (content) => {
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'output.txt'; 
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        const clearFields = (input1, input2, resultField) => {
+            input1.value = ''
+            input2.value = ''
+            resultField.textContent = ''
+        }
+
          // Rail Fence
+
+        fenceFileInput.addEventListener("change", event => {
+            const message = readDataFromFile(event, messageFenceInput)
+            messageFenceInput.value = message
+        })
+        buttonFence.addEventListener("click", event => {
+            const content = resultFieldFence.textContent
+            saveToFile(content)
+        })
+        buttonFenceClear.addEventListener("click", () => {
+            clearFields(messageFenceInput, keyFenceInput, resultFieldFence)
+        })
 
         const encryptRailFence = (message, key) => {
             const keyArray = Array.from({ length: key }, () => []);
@@ -178,17 +286,29 @@
             const key = parseInt(keyFenceInput.value, 10)
 
             const encryptedText = encryptRailFence(message, key)
-            resultField.textContent = encryptedText;
+            resultFieldFence.textContent = encryptedText;
         })
         decipherButtonFence.addEventListener("click", () => {
             const message = cleanTextFence(messageFenceInput.value)
             const key = parseInt(keyFenceInput.value, 10)
 
             const decipheredText = decipherRailFence(message, key)
-            resultField.textContent = decipheredText;
+            resultFieldFence.textContent = decipheredText;
         })
 
         // Vigenere
+
+        vigenereFileInput.addEventListener("change", event => {
+            const message = readDataFromFile(event, messageFenceVigenere)
+            messageFenceVigenere.value = message
+        })
+        buttonVigenere.addEventListener("click", event => {
+            const content = resultFieldVigenere.textContent
+            saveToFile(content)
+        })
+        buttonVigenereClear.addEventListener("click", () => {
+            clearFields(messageFenceVigenere, keyFenceVigenere, resultFieldVigenere)
+        })
 
         const encryptVinegere = (message, key) => {
             let encryptedText = '';
