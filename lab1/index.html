@@ -84,7 +84,7 @@
                     <p id="result-fence">
 
                     </p>
-                    <button id="button-fence-save">Сохранить в файл</button>
+                    <button id="button-fence-save" disabled="true">Сохранить в файл</button>
                     <button id="button-fence-clear">Очистить поля</button>
                 </div>
             </div>
@@ -113,7 +113,7 @@
                     <p id="result-vigenere">
 
                     </p>
-                    <button id="button-vigenere-save">Сохранить в файл</button>
+                    <button id="button-vigenere-save" disabled>Сохранить в файл</button>
                     <button id="button-vigenere-clear">Очистить поля</button>
                 </div>
             </div>
@@ -230,6 +230,8 @@
         fenceFileInput.addEventListener("change", event => {
             const message = readDataFromFile(event, messageFenceInput)
             messageFenceInput.value = message
+
+            buttonFence.disabled = true;
         })
         buttonFence.addEventListener("click", event => {
             const content = resultFieldFence.textContent
@@ -237,6 +239,8 @@
         })
         buttonFenceClear.addEventListener("click", () => {
             clearFields(messageFenceInput, keyFenceInput, resultFieldFence)
+
+            buttonFence.disabled = true;
         })
 
         const encryptRailFence = (message, key) => {
@@ -287,6 +291,12 @@
             }
             return output;
         }
+        messageFenceInput.addEventListener("blur", e => {
+            buttonFence.disabled = true;
+        })
+        keyFenceInput.addEventListener("blur", () => {
+            buttonFence.disabled = true;
+        })
         cipherButtonFence.addEventListener("click", () => {
             const message = cleanTextFence(messageFenceInput.value)
             const key = clearKeyFence(keyFenceInput.value)
@@ -301,6 +311,8 @@
 
             const encryptedText = encryptRailFence(message, key)
             resultFieldFence.textContent = encryptedText;
+
+            buttonFence.disabled = false;
         })
         decipherButtonFence.addEventListener("click", () => {
             const message = cleanTextFence(messageFenceInput.value)
@@ -316,6 +328,8 @@
 
             const decipheredText = decipherRailFence(message, key)
             resultFieldFence.textContent = decipheredText;
+
+            buttonFence.disabled = false;
         })
 
         // Vigenere
@@ -323,6 +337,8 @@
         vigenereFileInput.addEventListener("change", event => {
             const message = readDataFromFile(event, messageFenceVigenere)
             messageFenceVigenere.value = message
+
+            buttonVigenere.disabled = true
         })
         buttonVigenere.addEventListener("click", event => {
             const content = resultFieldVigenere.textContent
@@ -330,6 +346,8 @@
         })
         buttonVigenereClear.addEventListener("click", () => {
             clearFields(messageFenceVigenere, keyFenceVigenere, resultFieldVigenere)
+
+            buttonVigenere.disabled = true
         })
 
         const encryptVinegere = (message, key) => {
@@ -361,6 +379,13 @@
             return decryptedText;
         }
 
+        messageFenceVigenere.addEventListener("blur", () => {
+            buttonVigenere.disabled = true
+        })
+        keyFenceVigenere.addEventListener("blur", () => {
+            buttonVigenere.disabled = true
+        })
+
         cipherButtonVigenere.addEventListener("click", () => {
             const message = cleanText(messageFenceVigenere.value)
             const key = cleanText(keyFenceVigenere.value)
@@ -370,6 +395,8 @@
 
             const encryptedText = encryptVinegere(message, key)
             resultFieldVigenere.textContent = encryptedText
+
+            buttonVigenere.disabled = false
         })
         decipherButtonVigenere.addEventListener("click", () => {
             const message = cleanText(messageFenceVigenere.value)
@@ -380,6 +407,8 @@
 
             const decryptedText = decryptVinegere(message, key)
             resultFieldVigenere.textContent = decryptedText
+
+            buttonVigenere.disabled = false
         })
 
     </script>
