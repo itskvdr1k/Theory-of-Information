@@ -17,12 +17,12 @@
         input, button {
             margin: 5px 0;
         }
-        input {
-            display: block;
-            min-width: 250px;
-        }
         .section {
             margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 300px;
+            padding: 5px;
         }
     </style>
 </head>
@@ -41,12 +41,11 @@
         <h3>Сгенерированный ключ:</h3>
         <pre id="encryptKeyOutput"></pre>
 
-        <h3>Исходный файл (двоичный вид):</h3>
+        <h3>Исходный файл (первые и последние 8 байт):</h3>
         <pre id="encryptOriginalFileOutput"></pre>
 
-        <h3>Зашифрованный файл (двоичный вид):</h3>
+        <h3>Зашифрованный файл (первые и последние 8 байт):</h3>
         <pre id="encryptEncryptedFileOutput"></pre>
-
     </div>
 
     <!-- Секция для дешифрования -->
@@ -61,15 +60,15 @@
         <h3>Сгенерированный ключ:</h3>
         <pre id="decryptKeyOutput"></pre>
 
-        <h3>Зашифрованный файл (двоичный вид):</h3>
+        <h3>Зашифрованный файл (первые и последние 8 байт):</h3>
         <pre id="decryptEncryptedFileOutput"></pre>
 
-        <h3>Расшифрованный файл (двоичный вид):</h3>
+        <h3>Расшифрованный файл (первые и последние 8 байт):</h3>
         <pre id="decryptDecryptedFileOutput"></pre>
     </div>
 
     <!-- Тестирование с определенными данными -->
-
+    
 
     <script>
         class LFSR {
@@ -98,6 +97,16 @@
             return key;
         }
 
+        function formatData(data) {
+            if (data.length <= 16) {
+                return Array.from(data).map(b => b.toString(2).padStart(8, '0')).join(' ');
+            } else {
+                let first8 = Array.from(data.slice(0, 8)).map(b => b.toString(2).padStart(8, '0')).join(' ');
+                let last8 = Array.from(data.slice(-8)).map(b => b.toString(2).padStart(8, '0')).join(' ');
+                return `Первые 8 байт: ${first8}\nПоследние 8 байт: ${last8}`;
+            }
+        }
+
         function encryptFile() {
             let initialState = document.getElementById('encryptInitialState').value.replace(/[^01]/g, '');
             if (initialState.length !== 27) {
@@ -123,8 +132,8 @@
 
                 // Вывод результатов
                 document.getElementById('encryptKeyOutput').textContent = key;
-                document.getElementById('encryptOriginalFileOutput').textContent = Array.from(data).map(b => b.toString(2).padStart(8, '0')).join(' ');
-                document.getElementById('encryptEncryptedFileOutput').textContent = Array.from(encryptedData).map(b => b.toString(2).padStart(8, '0')).join(' ');
+                document.getElementById('encryptOriginalFileOutput').textContent = formatData(data);
+                document.getElementById('encryptEncryptedFileOutput').textContent = formatData(encryptedData);
 
                 // Создание ссылки для скачивания зашифрованного файла
                 let blob = new Blob([encryptedData], { type: 'application/octet-stream' });
@@ -163,8 +172,8 @@
 
                 // Вывод результатов
                 document.getElementById('decryptKeyOutput').textContent = key;
-                document.getElementById('decryptEncryptedFileOutput').textContent = Array.from(data).map(b => b.toString(2).padStart(8, '0')).join(' ');
-                document.getElementById('decryptDecryptedFileOutput').textContent = Array.from(decryptedData).map(b => b.toString(2).padStart(8, '0')).join(' ');
+                document.getElementById('decryptEncryptedFileOutput').textContent = formatData(data);
+                document.getElementById('decryptDecryptedFileOutput').textContent = formatData(decryptedData);
 
                 // Создание ссылки для скачивания расшифрованного файла
                 let blob = new Blob([decryptedData], { type: 'application/octet-stream' });
