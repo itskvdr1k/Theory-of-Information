@@ -29,7 +29,6 @@
 <body>
     <h1>LFSR Шифрование/Дешифрование</h1>
 
-    <!-- Секция для шифрования -->
     <div class="section">
         <h2>Шифрование</h2>
         <input type="text" id="encryptInitialState" placeholder="Введите начальное состояние регистра (27 бит, только 0 и 1)">
@@ -47,8 +46,6 @@
         <h3>Зашифрованный файл (первые и последние 8 байт):</h3>
         <pre id="encryptEncryptedFileOutput"></pre>
     </div>
-
-    <!-- Секция для дешифрования -->
     <div class="section">
         <h2>Дешифрование</h2>
         <input type="text" id="decryptInitialState" placeholder="Введите начальное состояние регистра (27 бит, только 0 и 1)">
@@ -66,16 +63,12 @@
         <h3>Расшифрованный файл (первые и последние 8 байт):</h3>
         <pre id="decryptDecryptedFileOutput"></pre>
     </div>
-
-    <!-- Тестирование с определенными данными -->
-    
-
     <script>
         class LFSR {
             constructor(initialState, degree) {
                 this.state = initialState;
                 this.degree = degree;
-                this.taps = [0, 2, 4, 5, 7, 10, 11, 14, 15, 17, 21, 22, 23, 26]; // Пример для степени 27
+                this.taps = [0, 6, 7, 26]
             }
 
             next() {
@@ -130,12 +123,10 @@
                     encryptedData[i] = data[i] ^ parseInt(key.substr(i * 8, 8), 2);
                 }
 
-                // Вывод результатов
                 document.getElementById('encryptKeyOutput').textContent = key;
                 document.getElementById('encryptOriginalFileOutput').textContent = formatData(data);
                 document.getElementById('encryptEncryptedFileOutput').textContent = formatData(encryptedData);
 
-                // Создание ссылки для скачивания зашифрованного файла
                 let blob = new Blob([encryptedData], { type: 'application/octet-stream' });
                 let url = URL.createObjectURL(blob);
                 let a = document.createElement('a');
@@ -170,12 +161,10 @@
                     decryptedData[i] = data[i] ^ parseInt(key.substr(i * 8, 8), 2);
                 }
 
-                // Вывод результатов
                 document.getElementById('decryptKeyOutput').textContent = key;
                 document.getElementById('decryptEncryptedFileOutput').textContent = formatData(data);
                 document.getElementById('decryptDecryptedFileOutput').textContent = formatData(decryptedData);
 
-                // Создание ссылки для скачивания расшифрованного файла
                 let blob = new Blob([decryptedData], { type: 'application/octet-stream' });
                 let url = URL.createObjectURL(blob);
                 let a = document.createElement('a');
@@ -187,39 +176,31 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // Тестирование шифрования
         function testEncryption() {
             let initialState = '110110101011101010101010101'; // Пример начального состояния (27 бит)
             document.getElementById('encryptInitialState').value = initialState;
 
-            // Создаем тестовый файл
             let testData = new Uint8Array([72, 101, 108, 108, 111]); // "Hello" в байтах
             let blob = new Blob([testData], { type: 'application/octet-stream' });
             let file = new File([blob], 'test.txt');
 
-            // Эмулируем выбор файла
             let fileInput = document.getElementById('encryptFileInput');
             fileInput.files = new FileList([file]);
 
-            // Запускаем шифрование
             encryptFile();
         }
 
-        // Тестирование дешифрования
         function testDecryption() {
-            let initialState = '110110101011101010101010101'; // Пример начального состояния (27 бит)
+            let initialState = '110110101011101010101010101'; // 27 bit
             document.getElementById('decryptInitialState').value = initialState;
 
-            // Создаем тестовый зашифрованный файл
             let testData = new Uint8Array([72 ^ 0b11011010, 101 ^ 0b10101110, 108 ^ 0b10101010, 108 ^ 0b10101010, 111 ^ 0b10101010]); // Пример зашифрованных данных
             let blob = new Blob([testData], { type: 'application/octet-stream' });
             let file = new File([blob], 'encrypted_test.txt');
 
-            // Эмулируем выбор файла
             let fileInput = document.getElementById('decryptFileInput');
             fileInput.files = new FileList([file]);
 
-            // Запускаем дешифрование
             decryptFile();
         }
     </script>
