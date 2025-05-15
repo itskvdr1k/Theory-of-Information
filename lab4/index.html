@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RSA</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .group { margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        input { margin: 5px; padding: 5px; }
+        button { padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #45a049; }
+        .output { margin-top: 10px; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="group">
+            <h3>Генерация подписи</h3>
+            <input type="file" id="fileInput">
+            <br>
+            <input type="number" id="pInput" placeholder="Введите p">
+            <input type="number" id="qInput" placeholder="Введите q">
+            <input type="number" id="dInput" placeholder="Введите d">
+            <button onclick="generateSignature()">Подписать файл</button>
+            <div class="output" id="hashOutput"></div>
+            <div class="output" id="signatureOutput"></div>
+        </div>
+
+        <div class="group">
+            <h3>Проверка подписи</h3>
+            <input type="file" id="verifyFileInput">
+            <button onclick="verifySignature()">Проверить подпись</button>
+            <div class="output" id="verifyResult"></div>
+            <div class="output" id="verifyValues"></div>
+        </div>
+    </div>
+
+    <script>
+        function powMod(base, exp, mod) {
+            let result = 1n;
+            base = BigInt(base);
+            exp = BigInt(exp);
+            mod = BigInt(mod);
+            while (exp > 0n) {
+                if (exp % 2n === 1n) result = (result * base) % mod;
+                base = (base * base) % mod;
+                exp = exp / 2n;
+            }
+            return result;
+        }
+
+        function isPrime(num) {
+            if (num <= 1n) return false;
+            for (let i = 2n; i * i <= num; i++) {
+                if (num % i === 0n) return false;
+            }
+            return true;
+        }
+
+        function computeHash(text, n) {
+            let H = 100n;
+            for (let char of text) {
+                const M = BigInt(char.charCodeAt(0));
+                H = powMod((H ^ M), 3, n);
+            }
+            return H;
+        }
+
+        async function generateSignature() {
+            const p = BigInt(document.getElementById('pInput').value);
+            const q = BigInt(document.getElementById('qInput').value);
+            const d = BigInt(document.getElementById('dInput').value);
+            
+            if (!isPrime(p) || !isPrime(q)) {
+                alert('p и q должны быть простыми числами!');
+                return;
+            }
+            if (p === q) {
+                alert('p и q должны быть разными!');
+                return;
+            }
+            const n = p * q;
+            const phi = (p - 1n) * (q - 1n);
+            if (d <= 1n || d >= phi || gcd(d, phi) !== 1n) {
+                alert('Некорректный закрытый ключ d!');
+                return;
+            }
+
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) return;
+            const text = await file.text();
+            
+            const hash = computeHash(text, n);
+            document.getElementById('hashOutput').innerHTML = `Хеш: ${hash.toString()}`;
+            
+            const signature = powMod(hash, d, n);
+            document.getElementById('signatureOutput').innerHTML = `ЭЦП: ${signature.toString()}`;
+            
+            const newContent = text + '\nSIGNATURE:' + signature.toString();
+            const blob = new Blob([newContent], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'signed_' + file.name;
+            a.click();
+        }
+
+        async function verifySignature() {
+            const file = document.getElementById('verifyFileInput').files[0];
+            if (!file) return;
+            const content = await file.text();
+            
+            const parts = content.split('\nSIGNATURE:');
+            if (parts.length !== 2) {
+                document.getElementById('verifyResult').innerHTML = 'Подпись отсутствует!';
+                return;
+            }
+            const [text, signature] = parts;
+            
+            const p = BigInt(document.getElementById('pInput').value);
+            const q = BigInt(document.getElementById('qInput').value);
+            const d = BigInt(document.getElementById('dInput').value);
+            const n = p * q;
+            const phi = (p - 1n) * (q - 1n);
+            const e = modInverse(d, phi);
+            
+            const computedHash = computeHash(text, n);
+            const receivedHash = powMod(BigInt(signature), e, n);
+            
+            document.getElementById('verifyValues').innerHTML = 
+                `Вычисленный хеш: ${computedHash}<br>Полученный хеш: ${receivedHash}`;
+            document.getElementById('verifyResult').innerHTML = 
+                `Подпись ${computedHash === receivedHash ? 'верна' : 'неверна'}`;
+        }
+
+        function gcd(a, b) {
+            while (b !== 0n) {
+                let temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
+
+        function modInverse(a, m) {
+            let [old_r, r] = [a, m];
+            let [old_s, s] = [1n, 0n];
+            while (r !== 0n) {
+                const quotient = old_r / r;
+                [old_r, r] = [r, old_r - quotient * r];
+                [old_s, s] = [s, old_s - quotient * s];
+            }
+            return old_s < 0n ? old_s + m : old_s;
+        }
+    </script>
+</body>
+</html>
