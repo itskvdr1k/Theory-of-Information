@@ -10,6 +10,11 @@
         button { padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; }
         button:hover { background: #45a049; }
         .output { margin-top: 10px; padding: 10px; background: #f0f0f0; }
+        #fileContent { 
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -24,6 +29,11 @@
             <button onclick="generateSignature()">Подписать файл</button>
             <div class="output" id="hashOutput"></div>
             <div class="output" id="signatureOutput"></div>
+        </div>
+
+        <div class="group">
+            <h3>Содержимое файла</h3>
+            <div class="output" id="fileContent"></div>
         </div>
 
         <div class="group">
@@ -65,6 +75,16 @@
             }
             return H;
         }
+
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const text = await file.text();
+            document.getElementById('fileContent').textContent = text;
+        }
+
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+        document.getElementById('verifyFileInput').addEventListener('change', handleFileSelect);
 
         async function generateSignature() {
             const p = BigInt(document.getElementById('pInput').value);
